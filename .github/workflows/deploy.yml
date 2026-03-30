@@ -29,10 +29,10 @@ jobs:
         run: npm ci
 
       - name: Install Boltic CLI
-        run: npm install -g @boltic/cli@1.0.44-dev1.2 
+        run: npm install -g @boltic/cli@1.0.44-dev1.3 
 
-      - name: Authenticate with Boltic
-        run: boltic login --token ${{ secrets.BOLTIC_TOKEN }} --account-id ${{ secrets.BOLTIC_ACCOUNT_ID }}
+      # - name: Authenticate with Boltic
+      #   run: boltic login --token ${{ secrets.BOLTIC_TOKEN }} --account-id ${{ secrets.BOLTIC_ACCOUNT_ID }}
 
       - name: Deploy serverless function
         run: boltic serverless publish
