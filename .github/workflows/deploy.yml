@@ -1,12 +1,9 @@
 name: Deploy to Boltic
-
 on:
   push:
     branches: [main]
-
 env:
   SERVERLESS_NAME: githubcheckcicd
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,11 +14,16 @@ jobs:
           fetch-depth: 0
 
       - name: Setup SSH
+        env:
+          BOLTIC_SSH_KEY_B64: ${{ secrets.BOLTIC_SSH_KEY_B64 }}
         run: |
           mkdir -p ~/.ssh
           echo "${BOLTIC_SSH_KEY_B64}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ssh.git.boltic.io >> ~/.ssh/known_hosts
+          echo "Host ssh.git.boltic.io
+            IdentityFile ~/.ssh/id_rsa
+            User git" >> ~/.ssh/config
 
       - name: Push to Boltic
         run: |
