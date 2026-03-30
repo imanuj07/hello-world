@@ -1,44 +1,29 @@
-name: Deploy Serverless
+name: Deploy to Boltic
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:  # Allow manual triggers
+    branches: [main]
 
 env:
-  NODE_VERSION: '20'
-  SERVERLESS_NAME: 'githubcheckcicd'
+  SERVERLESS_NAME: githubcheckcicd
 
 jobs:
   deploy:
-    name: Deploy to Boltic
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Boltic CLI
-        run: npm install -g @boltic/cli@1.0.44-dev1.4 
-
-      - name: Authenticate with Boltic
-        run: boltic login --token ${{ secrets.BOLTIC_TOKEN }} --account-id ${{ secrets.BOLTIC_ACCOUNT_ID }}
-
-      - name: Deploy serverless function
-        run: boltic serverless publish
-
-      - name: Verify deployment
+      - name: Setup SSH key
         run: |
-          echo "Waiting for deployment to be ready..."
-          sleep 10
-          boltic serverless status --name ${{ env.SERVERLESS_NAME }} --watch
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BOLTIC_SSH_KEY_B64 }}" | base64 -d > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan ssh.git.boltic.io >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Push to Boltic
+        run: |
+          git remote add boltic git@ssh.git.boltic.io:${{ secrets.BOLTIC_ACCOUNT_ID }}/${{ env.SERVERLESS_NAME }}.git
+          git push boltic main --force
