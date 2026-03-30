@@ -15,10 +15,10 @@ jobs:
 
       - name: Setup SSH
         env:
-          BOLTIC_SSH_KEY_B64: ${{ secrets.BOLTIC_SSH_KEY_B64 }}
+          BOLTIC_SSH_PRIVATE_KEY: ${{ secrets.BOLTIC_SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${BOLTIC_SSH_KEY_B64}" | base64 -d > ~/.ssh/id_rsa
+          echo "${BOLTIC_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ssh.git.boltic.io >> ~/.ssh/known_hosts
           echo "Host ssh.git.boltic.io
