@@ -26,6 +26,8 @@ jobs:
             User git" >> ~/.ssh/config
 
       - name: Push to Boltic
+        env:
+          BOLTIC_ACCOUNT_ID: ${{ secrets.BOLTIC_ACCOUNT_ID }}
         run: |
-          git remote add boltic git@ssh.git.boltic.io:312fb7be-7a5b-47d7-8563-03635476d7b2/githubcheckcicd.git
+          git remote add boltic git@ssh.git.boltic.io:${BOLTIC_ACCOUNT_ID}/${SERVERLESS_NAME}.git
           git push boltic main --force
